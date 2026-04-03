@@ -6,7 +6,7 @@ const socketIo = require("socket.io");
 const server = http.createServer(app);
 const io = new socketIo.Server(server, {
   cors: {
-    origin: "*",
+    origin: "https://smart-x-front-end-git-main-zoya-shaikhs-projects.vercel.app/",
     methods: ["GET", "POST"],
     credentials: true,
   },

@@ -13,7 +13,10 @@ const { app, server } = require("./socket/socket");
 
 const PORT = process.env.PORT || 4000;
 
-app.use(cors());
+app.use(cors({
+  origin: "https://smart-x-front-end-git-main-zoya-shaikhs-projects.vercel.app/",
+  credentials: true,
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(fileUpload({
