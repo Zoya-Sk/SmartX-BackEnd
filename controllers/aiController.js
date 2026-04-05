@@ -156,38 +156,38 @@ Rules:
     });
 
     // return response
-    return res.status(200).json({ 
-            success: true,
-            message: "Description enhanced successfully!",
-            response: response.choices[0].message.content, 
-        });
+    return res.status(200).json({
+      success: true,
+      message: "Description enhanced successfully!",
+      response: response.choices[0].message.content,
+    });
   } catch (error) {
-        console.log(error);  // ← empty catch tha
-        return res.status(500).json({
-            success: false,
-            message: "Internal Server Error!",
-        });
-    }
+    console.log(error); // ← empty catch tha
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error!",
+    });
+  }
 };
 
 // product title enhancer
 exports.titleEnhancer = async (req, res) => {
-    try {
-        const { title } = req.body;
+  try {
+    const { title } = req.body;
 
-        if (!title) {
-            return res.status(400).json({
-                success: false,
-                message: "Please Enter the Product Title.",
-            });
-        }
+    if (!title) {
+      return res.status(400).json({
+        success: false,
+        message: "Please Enter the Product Title.",
+      });
+    }
 
-        const response = await groq.chat.completions.create({
-            model: "llama-3.3-70b-versatile",
-            messages: [
-                {
-                    role: "system",
-                    content: `You are an expert product title enhancer for SmartX online marketplace.
+    const response = await groq.chat.completions.create({
+      model: "llama-3.3-70b-versatile",
+      messages: [
+        {
+          role: "system",
+          content: `You are an expert product title enhancer for SmartX online marketplace.
 Your task is to rewrite and improve user-provided product titles so they are clear, relevant, and easy to find.
 Rules:
 - Keep the title short and to the point (maximum 10 words)
@@ -195,23 +195,23 @@ Rules:
 - Do NOT use emojis, hashtags, or special characters
 - Keep it truthful and relevant
 - Output ONLY the improved title and nothing else`,
-                },
-                { role: "user", content: title },
-            ],
-        });
+        },
+        { role: "user", content: title },
+      ],
+    });
 
-        return res.status(200).json({
-            success: true,
-            message: "Title enhanced successfully!",
-            response: response.choices[0].message.content,
-        });
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({
-            success: false,
-            message: "Internal Server Error!",
-        });
-    }
+    return res.status(200).json({
+      success: true,
+      message: "Title enhanced successfully!",
+      response: response.choices[0].message.content,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error!",
+    });
+  }
 };
 
 // fair price checker
@@ -228,21 +228,32 @@ exports.fairPriceChecker = async (req, res) => {
 
     const response = await groq.chat.completions.create({
       model: "llama-3.3-70b-versatile",
+      temperature: 0, // same input = same output
       messages: [
         {
           role: "system",
-          content: `You are a marketplace pricing expert in India. Analyze if a product listed on SmartX (an OLX-like platform) is fairly priced.
-          
-Rules:
-- Consider Indian second-hand market prices
-- Be realistic and helpful
-- Output ONLY valid JSON, no extra text, no markdown
-- JSON format must be exactly:
-{"verdict": "Fair" | "Great Deal" | "Overpriced" | "Slightly Overpriced", "emoji": "✅" | "🟢" | "🔴" | "🟡", "reason": "one sentence about typical Indian market price for this item"}`,
+          content: `You are a strict marketplace pricing expert for SmartX, an Indian second-hand marketplace similar to OLX.
+
+Your job is to analyze if a product is fairly priced based on typical Indian resale market prices.
+
+Verdict rules (follow strictly):
+- "Great Deal" 🟢 → price is 30% or more BELOW typical market value
+- "Fair" ✅ → price is within ±15% of typical market value  
+- "Slightly Overpriced" 🟡 → price is 15%-35% ABOVE typical market value
+- "Overpriced" 🔴 → price is more than 35% ABOVE typical market value
+
+Important:
+- Always consider the product CONDITION (New vs Used) — used items should be cheaper
+- Base your analysis on Indian cities like Mumbai, Delhi, Pune, Bangalore resale prices
+- Be consistent — same product and price should always get the same verdict
+- Output ONLY valid JSON, no markdown, no extra text
+
+JSON format:
+{"verdict": "Fair" | "Great Deal" | "Overpriced" | "Slightly Overpriced", "emoji": "✅" | "🟢" | "🔴" | "🟡", "reason": "one sentence mentioning approximate typical Indian resale price range for this item"}`,
         },
         {
           role: "user",
-          content: `Product: "${title}", Category: ${category || "General"}, Price: ₹${price}, Condition: ${condition || "Used"}`,
+          content: `Product: "${title}", Category: ${category || "General"}, Listed Price: ₹${price}, Condition: ${condition || "Used"}`,
         },
       ],
     });
