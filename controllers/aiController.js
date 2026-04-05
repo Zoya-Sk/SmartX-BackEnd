@@ -213,3 +213,53 @@ Rules:
         });
     }
 };
+
+// fair price checker
+exports.fairPriceChecker = async (req, res) => {
+  try {
+    const { title, category, price, condition } = req.body || {};
+
+    if (!title || !price) {
+      return res.status(400).json({
+        success: false,
+        message: "Title and price are required.",
+      });
+    }
+
+    const response = await groq.chat.completions.create({
+      model: "llama-3.3-70b-versatile",
+      messages: [
+        {
+          role: "system",
+          content: `You are a marketplace pricing expert in India. Analyze if a product listed on SmartX (an OLX-like platform) is fairly priced.
+          
+Rules:
+- Consider Indian second-hand market prices
+- Be realistic and helpful
+- Output ONLY valid JSON, no extra text, no markdown
+- JSON format must be exactly:
+{"verdict": "Fair" | "Great Deal" | "Overpriced" | "Slightly Overpriced", "emoji": "✅" | "🟢" | "🔴" | "🟡", "reason": "one sentence about typical Indian market price for this item"}`,
+        },
+        {
+          role: "user",
+          content: `Product: "${title}", Category: ${category || "General"}, Price: ₹${price}, Condition: ${condition || "Used"}`,
+        },
+      ],
+    });
+
+    const text = response.choices[0].message.content;
+    const parsed = JSON.parse(text);
+
+    return res.status(200).json({
+      success: true,
+      message: "Price analysis done!",
+      response: parsed,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error!",
+    });
+  }
+};

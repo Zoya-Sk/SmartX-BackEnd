@@ -13,16 +13,24 @@ const { app, server } = require("./socket/socket");
 
 const PORT = process.env.PORT || 4000;
 
-app.use(cors({
-  origin: "https://smart-x-front-end-git-main-zoya-shaikhs-projects.vercel.app/",
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: [
+      "https://smart-x-front-end-git-main-zoya-shaikhs-projects.vercel.app",
+      "https://smart-x-front-end.vercel.app", 
+      "http://localhost:5173",
+    ],
+    credentials: true,
+  }),
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(fileUpload({
-    useTempFiles : true,
-    tempFileDir: './tmp/'
-}));
+app.use(
+  fileUpload({
+    useTempFiles: true,
+    tempFileDir: "./tmp/",
+  }),
+);
 
 // mount Route
 app.use("/api/v1", userRoute);
@@ -33,6 +41,6 @@ app.use("/api/v1", chatRoutes);
 
 dbConnect();
 
-server.listen(PORT,()=>{
-    console.log(`Server is running on PORT ${PORT}`);
+server.listen(PORT, () => {
+  console.log(`Server is running on PORT ${PORT}`);
 });
