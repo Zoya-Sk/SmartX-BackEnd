@@ -1,10 +1,10 @@
 const express = require("express");
 const app = express();
 const http = require("http");
-const socketIo = require("socket.io");
+const { Server } = require("socket.io");
 
 const server = http.createServer(app);
-const io = new socketIo(server, {
+const io = new Server(server, {
   cors: {
     origin: [
       "https://smart-x-front-end.vercel.app",
