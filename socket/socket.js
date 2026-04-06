@@ -4,12 +4,12 @@ const http = require("http");
 const socketIo = require("socket.io");
 
 const server = http.createServer(app);
-const io = new server(server, {
+const io = new socketIo(server, {
   cors: {
     origin: [
       "https://smart-x-front-end.vercel.app",
       "https://smart-x-front-end-git-main-zoya-shaikhs-projects.vercel.app",
-      "http://localhost:5173"
+      "http://localhost:5173",
     ],
     methods: ["GET", "POST"],
     credentials: true,
@@ -17,9 +17,9 @@ const io = new server(server, {
 });
 const allOnlineUsers = {};
 
-const getReceiverSocketId = (receiverId)=>{
+const getReceiverSocketId = (receiverId) => {
   return allOnlineUsers[receiverId];
-}
+};
 
 io.on("connection", (socket) => {
   const userId = socket.handshake.query.userId;
