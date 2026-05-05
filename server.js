@@ -10,6 +10,7 @@ const chatRoutes = require("./routes/chatRoute");
 const fileUpload = require("express-fileupload");
 const cors = require("cors");
 const { app, server } = require("./socket/socket");
+const paymentRoutes = require("./routes/paymentRoute");
 
 const PORT = process.env.PORT || 4000;
 
@@ -24,6 +25,7 @@ app.use(
     methods: ["GET", "POST", "PUT", "DELETE"],
   }),
 );
+app.use("/api/v1/payment/webhook", express.raw({ type: "application/json" }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
@@ -39,6 +41,7 @@ app.use("/api/v1", categoryRoutes);
 app.use("/api/v1", productRoutes);
 app.use("/api/v1", aiRoutes);
 app.use("/api/v1", chatRoutes);
+app.use("/api/v1", paymentRoutes);
 
 dbConnect();
 
